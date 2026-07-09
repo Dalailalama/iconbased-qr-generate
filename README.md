@@ -45,4 +45,4 @@ Changes re-render the QR code live once one has been generated.
 
 ## Live Demo
 
-(link added after deployment)
+**https://dalailalama.github.io/iconbased-qr-generate/**
