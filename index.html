@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Icon QR Generator</title>
+<meta name="description" content="Generate QR codes with your own logo embedded in the center, entirely client-side.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="app">
+
+    <header class="topbar">
+      <div class="topbar__text">
+        <h1>Icon QR Generator</h1>
+        <p class="subtitle">Embed your own image as the logo in the center of a QR code — no server, no uploads, all in your browser.</p>
+      </div>
+    </header>
+
+    <div class="layout">
+
+      <main class="panel panel--form">
+        <form id="qr-form" novalidate>
+
+          <div class="field">
+            <label class="field__label" for="text-input">Data to encode <span class="required">(required)</span></label>
+            <textarea
+              id="text-input"
+              name="text"
+              class="text-input"
+              rows="3"
+              placeholder="Enter a URL or any text…"
+            ></textarea>
+            <p id="text-error" class="error-msg" hidden>Please enter some text or a URL before generating.</p>
+          </div>
+
+          <div class="field">
+            <label class="field__label" id="dropzone-label">Logo / icon image <span class="optional">(optional)</span></label>
+
+            <div id="dropzone" class="dropzone" tabindex="0" role="button" aria-labelledby="dropzone-label" aria-describedby="dropzone-hint">
+              <div class="dropzone__content">
+                <img id="image-preview" class="image-preview" alt="Selected logo preview" hidden>
+                <div id="dropzone-placeholder" class="dropzone__placeholder">
+                  <svg class="dropzone__icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path d="M12 16V4M12 4L7 9M12 4l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <p id="dropzone-hint">Drag &amp; drop an image, or <span class="link-text">click to browse</span></p>
+                </div>
+              </div>
+              <input type="file" id="image-input" name="image" accept="image/*" class="visually-hidden">
+            </div>
+
+            <button type="button" id="clear-image-btn" class="clear-image-btn" hidden>Remove image</button>
+          </div>
+
+          <details class="customize" id="customize-panel" open>
+            <summary>Customize <span class="customize__hint">styles, colors &amp; more</span></summary>
+
+            <div class="customize__grid">
+
+              <fieldset class="cgroup">
+                <legend>General</legend>
+                <div class="crow">
+                  <label for="opt-size">Size <span class="cval" id="opt-size-val">280px</span></label>
+                  <input type="range" id="opt-size" min="200" max="1000" step="20" value="280">
+                </div>
+                <div class="crow">
+                  <label for="opt-margin">Quiet zone margin <span class="cval" id="opt-margin-val">8</span></label>
+                  <input type="range" id="opt-margin" min="0" max="40" step="1" value="8">
+                </div>
+                <div class="crow">
+                  <label for="opt-shape">Shape</label>
+                  <select id="opt-shape">
+                    <option value="square" selected>Square</option>
+                    <option value="circle">Circle</option>
+                  </select>
+                </div>
+                <div class="crow">
+                  <label for="opt-ecl">Error correction</label>
+                  <select id="opt-ecl">
+                    <option value="auto" selected>Auto (H with logo)</option>
+                    <option value="L">L — low (7%)</option>
+                    <option value="M">M — medium (15%)</option>
+                    <option value="Q">Q — quartile (25%)</option>
+                    <option value="H">H — high (30%)</option>
+                  </select>
+                </div>
+                <div class="crow">
+                  <label for="opt-format">Download format</label>
+                  <select id="opt-format">
+                    <option value="png" selected>PNG</option>
+                    <option value="jpeg">JPEG</option>
+                    <option value="webp">WEBP</option>
+                    <option value="svg">SVG</option>
+                  </select>
+                </div>
+              </fieldset>
+
+              <fieldset class="cgroup">
+                <legend>Dots</legend>
+                <div class="crow">
+                  <label for="opt-dots-type">Style</label>
+                  <select id="opt-dots-type">
+                    <option value="square">Square</option>
+                    <option value="dots">Dots</option>
+                    <option value="rounded" selected>Rounded</option>
+                    <option value="extra-rounded">Extra rounded</option>
+                    <option value="classy">Classy</option>
+                    <option value="classy-rounded">Classy rounded</option>
+                  </select>
+                </div>
+                <div class="crow crow--inline">
+                  <label for="opt-dots-color">Color</label>
+                  <input type="color" id="opt-dots-color" value="#1c1d2b">
+                </div>
+                <div class="crow crow--inline">
+                  <label for="opt-dots-gradient">Use gradient</label>
+                  <input type="checkbox" id="opt-dots-gradient">
+                </div>
+                <div id="dots-gradient-controls" hidden>
+                  <div class="crow crow--inline">
+                    <label for="opt-dots-color2">Second color</label>
+                    <input type="color" id="opt-dots-color2" value="#5a4bff">
+                  </div>
+                  <div class="crow">
+                    <label for="opt-dots-gtype">Gradient type</label>
+                    <select id="opt-dots-gtype">
+                      <option value="linear" selected>Linear</option>
+                      <option value="radial">Radial</option>
+                    </select>
+                  </div>
+                  <div class="crow">
+                    <label for="opt-dots-grot">Gradient angle <span class="cval" id="opt-dots-grot-val">0°</span></label>
+                    <input type="range" id="opt-dots-grot" min="0" max="360" step="5" value="0">
+                  </div>
+                </div>
+              </fieldset>
+
+              <fieldset class="cgroup">
+                <legend>Corner squares</legend>
+                <div class="crow">
+                  <label for="opt-cs-type">Style</label>
+                  <select id="opt-cs-type">
+                    <option value="">Match dots</option>
+                    <option value="dot">Dot</option>
+                    <option value="square">Square</option>
+                    <option value="rounded">Rounded</option>
+                    <option value="extra-rounded" selected>Extra rounded</option>
+                    <option value="dots">Dots</option>
+                    <option value="classy">Classy</option>
+                    <option value="classy-rounded">Classy rounded</option>
+                  </select>
+                </div>
+                <div class="crow crow--inline">
+                  <label for="opt-cs-color">Color</label>
+                  <input type="color" id="opt-cs-color" value="#1c1d2b">
+                </div>
+              </fieldset>
+
+              <fieldset class="cgroup">
+                <legend>Corner dots</legend>
+                <div class="crow">
+                  <label for="opt-cd-type">Style</label>
+                  <select id="opt-cd-type">
+                    <option value="" selected>Match dots</option>
+                    <option value="dot">Dot</option>
+                    <option value="square">Square</option>
+                    <option value="rounded">Rounded</option>
+                    <option value="extra-rounded">Extra rounded</option>
+                    <option value="dots">Dots</option>
+                    <option value="classy">Classy</option>
+                    <option value="classy-rounded">Classy rounded</option>
+                  </select>
+                </div>
+                <div class="crow crow--inline">
+                  <label for="opt-cd-color">Color</label>
+                  <input type="color" id="opt-cd-color" value="#1c1d2b">
+                </div>
+              </fieldset>
+
+              <fieldset class="cgroup">
+                <legend>Background</legend>
+                <div class="crow crow--inline">
+                  <label for="opt-bg-transparent">Transparent</label>
+                  <input type="checkbox" id="opt-bg-transparent">
+                </div>
+                <div class="crow crow--inline">
+                  <label for="opt-bg-color">Color</label>
+                  <input type="color" id="opt-bg-color" value="#ffffff">
+                </div>
+                <div class="crow">
+                  <label for="opt-bg-round">Corner rounding <span class="cval" id="opt-bg-round-val">0</span></label>
+                  <input type="range" id="opt-bg-round" min="0" max="1" step="0.05" value="0">
+                </div>
+              </fieldset>
+
+              <fieldset class="cgroup" id="logo-group" disabled>
+                <legend>Logo</legend>
+                <div class="crow">
+                  <label for="opt-logo-size">Logo size <span class="cval" id="opt-logo-size-val">38%</span></label>
+                  <input type="range" id="opt-logo-size" min="0.15" max="0.5" step="0.01" value="0.38">
+                </div>
+                <div class="crow">
+                  <label for="opt-logo-margin">Logo margin <span class="cval" id="opt-logo-margin-val">6</span></label>
+                  <input type="range" id="opt-logo-margin" min="0" max="20" step="1" value="6">
+                </div>
+                <div class="crow crow--inline">
+                  <label for="opt-logo-hidedots">Hide dots behind logo</label>
+                  <input type="checkbox" id="opt-logo-hidedots" checked>
+                </div>
+              </fieldset>
+
+            </div>
+
+            <button type="button" id="reset-options-btn" class="reset-btn">Reset to defaults</button>
+          </details>
+
+          <button type="submit" id="generate-btn" class="generate-btn">Generate QR Code</button>
+        </form>
+      </main>
+
+      <aside class="panel panel--preview">
+        <h2 class="panel__title"><span class="live-dot" aria-hidden="true"></span>Live preview</h2>
+        <div class="result-section">
+          <p id="qr-placeholder" class="qr-placeholder">Start typing above to see your QR code appear here — it updates live as you customize.</p>
+          <div id="qr-container" class="qr-container" hidden></div>
+          <p id="qr-hint" class="qr-hint" hidden>Click to download</p>
+        </div>
+      </aside>
+
+    </div>
+
+    <footer class="app-footer">
+      Built with <a href="https://github.com/kozakdenys/qr-code-styling" target="_blank" rel="noopener noreferrer">qr-code-styling</a>.
+    </footer>
+
+  </div>
+
+  <script src="https://unpkg.com/qr-code-styling@1.9.2/lib/qr-code-styling.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
